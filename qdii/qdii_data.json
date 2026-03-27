@@ -1,0 +1,152 @@
+[
+  {
+    "fund_code": "513870",
+    "fund_name": "纳指ETF富国",
+    "price": 1.234,
+    "nav": 1.150,
+    "premium_rate": 7.30,
+    "increase_rate": "+2.35%",
+    "volume": "125.6万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159941",
+    "fund_name": "纳指ETF",
+    "price": 1.567,
+    "nav": 1.520,
+    "premium_rate": 3.09,
+    "increase_rate": "+1.82%",
+    "volume": "234.5万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513100",
+    "fund_name": "纳指ETF国泰",
+    "price": 2.345,
+    "nav": 2.280,
+    "premium_rate": 2.85,
+    "increase_rate": "+1.56%",
+    "volume": "189.3万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159509",
+    "fund_name": "纳指科技ETF",
+    "price": 0.987,
+    "nav": 0.920,
+    "premium_rate": 7.28,
+    "increase_rate": "+3.21%",
+    "volume": "456.7万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513050",
+    "fund_name": "中概互联ETF",
+    "price": 0.678,
+    "nav": 0.710,
+    "premium_rate": -4.51,
+    "increase_rate": "-1.23%",
+    "volume": "567.8万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159605",
+    "fund_name": "中概互联ETF",
+    "price": 0.543,
+    "nav": 0.560,
+    "premium_rate": -3.04,
+    "increase_rate": "-0.98%",
+    "volume": "345.6万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513060",
+    "fund_name": "恒生医疗ETF",
+    "price": 0.456,
+    "nav": 0.450,
+    "premium_rate": 1.33,
+    "increase_rate": "+0.75%",
+    "volume": "123.4万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159892",
+    "fund_name": "恒生科技ETF",
+    "price": 0.389,
+    "nav": 0.400,
+    "premium_rate": -2.75,
+    "increase_rate": "-0.45%",
+    "volume": "234.5万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513030",
+    "fund_name": "德国ETF",
+    "price": 1.234,
+    "nav": 1.100,
+    "premium_rate": 12.18,
+    "increase_rate": "+4.56%",
+    "volume": "89.7万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513080",
+    "fund_name": "法国ETF",
+    "price": 1.123,
+    "nav": 1.050,
+    "premium_rate": 6.95,
+    "increase_rate": "+2.34%",
+    "volume": "67.8万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159529",
+    "fund_name": "标普消费ETF",
+    "price": 2.567,
+    "nav": 2.200,
+    "premium_rate": 16.68,
+    "increase_rate": "+5.67%",
+    "volume": "156.7万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513500",
+    "fund_name": "标普500ETF",
+    "price": 1.890,
+    "nav": 1.780,
+    "premium_rate": 6.18,
+    "increase_rate": "+1.89%",
+    "volume": "245.6万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159612",
+    "fund_name": "标普500ETF",
+    "price": 1.456,
+    "nav": 1.390,
+    "premium_rate": 4.75,
+    "increase_rate": "+1.45%",
+    "volume": "178.9万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513520",
+    "fund_name": "日经225ETF",
+    "price": 1.678,
+    "nav": 1.550,
+    "premium_rate": 8.26,
+    "increase_rate": "+3.45%",
+    "volume": "267.8万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159866",
+    "fund_name": "日经225ETF",
+    "price": 1.345,
+    "nav": 1.280,
+    "premium_rate": 5.08,
+    "increase_rate": "+2.67%",
+    "volume": "198.7万",
+    "update_time": "2026-03-27 13:10:00"
+  }
+]

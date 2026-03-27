@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金融仪表板 | Finance Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 金融仪表板</h1>
+            <p class="subtitle">Finance Dashboard</p>
+            <div class="clock" id="clock"></div>
+        </header>
+
+        <main class="grid">
+            <!-- Meta 估值 -->
+            <div class="card" onclick="window.location.href='meta/index.html'">
+                <div class="card-icon">📈</div>
+                <h2>Meta 估值模型</h2>
+                <p>Meta Platforms 估值模型可视化分析</p>
+                <div class="card-footer">
+                    <span class="tag">DCF</span>
+                    <span class="tag">Multiples</span>
+                </div>
+            </div>
+
+            <!--            全球均衡投资 -->
+            <div class="card" onclick="window.location.href='global/index.html'">
+                <div class="card-icon">🌍</div>
+                <h2>全球均衡投资</h2>
+                <p>全球资产配置与均衡投资策略</p>
+                <div class="card-footer">
+                    <span class="tag">Asset Allocation</span>
+                    <span class="tag">Rebalancing</span>
+                </div>
+            </div>
+
+            <!-- QDII 监控 -->
+            <div class="card" onclick="window.location.href='qdii/index.html'">
+                <div class="card-icon">💰</div>
+                <h2>QDII 基金监控</h2>
+                <p>QDII 基金实时溢价率监控与筛选</p>
+                <div class="card-footer">
+                    <span class="tag">Real-time</span>
+                    <span class="tag">Premium Rate</span>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>数据仅供参考，不构成投资建议。投资有风险，入市需谨慎。</p>
+            <p class="update-time" id="updateTime">数据最后更新：--</p>
+        </footer>
+    </div>
+
+    <script>
+        // 实时时钟
+        function updateClock() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                weekday: 'long',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('clock').textContent = now.toLocaleString('zh-CN', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 获取 QDII 数据更新时间
+        fetch('qdii/qdii_data.json')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.update_time) {
+                    document.getElementById('updateTime').textContent = `数据最后更新：${data.update_time}`;
+                }
+            })
+            .catch(() => {
+                // QDII 数据可能还未就绪
+            });
+
+        // 添加卡片悬停效果
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

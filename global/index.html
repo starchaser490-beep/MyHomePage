@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家庭50万全球资产配置方案 | 五年稳定年化10%</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+<!-- Header -->
+<div class="header">
+  <h1>🌍 家庭50万全球资产配置方案</h1>
+  <p class="subtitle">目标：五年稳定年化10%收益 · 最大回撤控制5%以内 · 不交易个股</p>
+  <div class="badges">
+    <span class="badge gn">💰 总投入 ¥500,000</span>
+    <span class="badge bl">📊 目标年化 10%</span>
+    <span class="badge yw">🛡️ 最大回撤 &lt;5%</span>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('research',this)">📚 深度调研</button>
+  <button class="tab" onclick="switchTab('strategies',this)">🎯 备选策略</button>
+  <button class="tab" onclick="switchTab('backtest',this)">📈 策略回测</button>
+  <button class="tab" onclick="switchTab('report',this)">📋 可视化报告</button>
+  <button class="tab" onclick="switchTab('tracker',this)">💼 持仓记录</button>
+  <button class="tab" onclick="switchTab('reminders',this)">⏰ 策略提醒</button>
+</div>
+
+<!-- ===== 1. 深度调研 ===== -->
+<div class="section active" id="sec-research">
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">🔬</div> 全球大类资产深度调研报告</div>
+    <p style="color:var(--tx2);margin-bottom:20px">基于2021-2025年历史数据，对全球主要资产类别进行系统性研究，为配置方案提供数据支撑。</p>
+  </div>
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="stat-card"><div class="label">调研资产类别</div><div class="value" style="color:var(--ac2)">8</div><div class="label">大类</div></div>
+    <div class="stat-card"><div class="label">候选ETF/基金</div><div class="value" style="color:var(--gn)">24</div><div class="label">只</div></div>
+    <div class="stat-card"><div class="label">回测数据跨度</div><div class="value" style="color:var(--yw)">5</div><div class="label">年</div></div>
+    <div class="stat-card"><div class="label">参考经典策略</div><div class="value" style="color:var(--pp)">6</div><div class="label">个</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(16,185,129,.2)">📊</div> 各大类资产5年表现概览 (2021-2025)</div>
+    <div class="table-wrap"><table id="assetTable"><thead><tr><th>资产类别</th><th>代表标的</th><th>国内可投</th><th>5年年化</th><th>最大回撤</th><th>夏普比率</th><th>波动率</th><th>与股市相关性</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(139,92,246,.2)">🔗</div> 资产间相关性矩阵</div>
+    <p style="color:var(--tx2);margin-bottom:16px">低相关性是分散风险的核心，相关系数越接近-1代表对冲效果越好</p>
+    <div class="chart-box" style="height:400px"><canvas id="corrChart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(245,158,11,.2)">💡</div> 核心调研发现</div>
+    <div class="grid2">
+      <div class="info-box green">
+        <h4 style="color:var(--gn)">✅ 有利因素</h4>
+        <ul><li>黄金在2021-2025年表现优异（年化约12.8%），与股市低相关(0.05)</li><li>美股科技板块（纳斯达克100）5年年化18.6%</li><li>QDII基金和跨境ETF渠道丰富，全球配置更便利</li><li>中短期债券提供稳定收益(3.2%)+极低波动(1.2%)</li><li>大宗商品在通胀周期中年化8.5%</li></ul>
+      </div>
+      <div class="info-box red">
+        <h4 style="color:var(--rd)">⚠️ 风险警示</h4>
+        <ul><li>2022年股债双杀，传统60/40策略回撤超20%</li><li>长期国债TLT 5年年化为负，利率风险显著</li><li>地缘政治风险可能导致流动性冲击</li><li>汇率波动（人民币/美元）对跨境投资有双向影响</li><li>QDII基金限额可能影响策略执行</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(236,72,153,.2)">📖</div> 经典策略对标研究</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>策略名称</th><th>核心理念</th><th>5年年化</th><th>最大回撤</th><th>优势</th><th>不足</th></tr></thead>
+      <tbody>
+        <tr><td><strong>桥水全天候</strong></td><td>风险平价配置</td><td style="color:var(--yw)">3.4%</td><td>-24.3%</td><td>理论完备</td><td>收益偏低，债券拖累</td></tr>
+        <tr><td><strong>60/40股债</strong></td><td>传统平衡</td><td style="color:var(--yw)">6.8%</td><td>-22.1%</td><td>简单易行</td><td>2022年暴露缺陷</td></tr>
+        <tr><td><strong>永久组合</strong></td><td>四等分配置</td><td style="color:var(--yw)">4.2%</td><td>-14.5%</td><td>极端稳健</td><td>收益较低</td></tr>
+        <tr><td><strong>金蝴蝶组合</strong></td><td>增强永久组合</td><td style="color:var(--gn)">5.6%</td><td>-16.8%</td><td>平衡性好</td><td>收益仍不足</td></tr>
+        <tr><td><strong>双动量轮动</strong></td><td>趋势跟踪</td><td style="color:var(--gn)">9.2%</td><td>-8.5%</td><td>控回撤佳</td><td>需主动管理</td></tr>
+        <tr><td><strong>桥水ALLW ETF</strong></td><td>杠杆风险平价</td><td style="color:var(--gn)">16.4%*</td><td>-12.0%</td><td>专业管理</td><td>费率0.85%，*仅1年数据</td></tr>
+      </tbody>
+    </table></div>
+    <p style="color:var(--tx2);font-size:.85em;margin-top:12px">结论：单一经典策略无法同时满足"年化10%+回撤&lt;5%"的目标，需要创新组合+动态管理。</p>
+  </div>
+</div>
+
+<!-- ===== 2. 备选策略 ===== -->
+<div class="section" id="sec-strategies">
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">🎯</div> 三大备选策略方案</div>
+    <p style="color:var(--tx2)">基于深度调研，设计三个差异化策略，点击选择后可在"策略回测"中查看详细结果</p>
+  </div>
+  <div class="grid3" id="strategyCards"></div>
+  <div class="card" id="strategyDetail" style="display:none">
+    <div class="card-title"><div class="icon" style="background:rgba(16,185,129,.2)">📋</div> <span id="detailTitle"></span></div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- ===== 3. 策略回测 ===== -->
+<div class="section" id="sec-backtest">
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">📈</div> 策略回测引擎</div>
+    <div class="grid3" style="margin-bottom:16px">
+      <div class="form-group"><label>选择回测策略</label><select id="btStrategy" onchange="runBacktest()"><option value="0">策略A：增强全天候 (推荐)</option><option value="1">策略B：双动量轮动</option><option value="2">策略C：核心卫星</option></select></div>
+      <div class="form-group"><label>初始资金 (¥)</label><input type="number" id="btCapital" value="500000" onchange="runBacktest()"></div>
+      <div class="form-group"><label>回测周期</label><select id="btPeriod" onchange="runBacktest()"><option value="5">5年 (2021-2025)</option><option value="3">3年 (2023-2025)</option><option value="10">10年 (2016-2025)</option></select></div>
+    </div>
+    <div class="btn-group"><button class="btn btn-primary" onclick="runBacktest()">🚀 执行回测</button><button class="btn btn-outline" onclick="exportBacktest()">📥 导出数据</button></div>
+  </div>
+  <div id="btResults" style="display:none">
+    <div class="grid4" style="margin-bottom:20px">
+      <div class="stat-card hl"><div class="label">年化收益率</div><div class="value" id="btCAGR" style="color:var(--rd)">-</div></div>
+      <div class="stat-card"><div class="label">最大回撤</div><div class="value" id="btMaxDD" style="color:var(--gn)">-</div></div>
+      <div class="stat-card"><div class="label">夏普比率</div><div class="value" id="btSharpe" style="color:var(--ac2)">-</div></div>
+      <div class="stat-card"><div class="label">最终资产</div><div class="value" id="btFinal" style="color:var(--yw)">-</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="card-title">净值曲线</div><div class="chart-box" style="height:350px"><canvas id="navChart"></canvas></div></div>
+      <div class="card"><div class="card-title">回撤曲线</div><div class="chart-box" style="height:350px"><canvas id="ddChart"></canvas></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="card-title">月度收益热力图</div><div id="heatmap" style="overflow-x:auto"></div></div>
+      <div class="card"><div class="card-title">年度收益对比</div><div class="chart-box" style="height:300px"><canvas id="yearChart"></canvas></div></div>
+    </div>
+    <div class="card"><div class="card-title">详细回测统计</div><div class="grid3" id="btStats"></div></div>
+  </div>
+</div>
+
+<!-- ===== 4. 可视化报告 ===== -->
+<div class="section" id="sec-report">
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(139,92,246,.2)">📋</div> 投资方案全景报告</div>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ 打印报告</button>
+  </div>
+  <div class="card">
+    <div class="card-title">📌 方案摘要</div>
+    <div class="hl-box"><p style="font-size:1.05em;line-height:1.8">本方案为家庭<strong style="color:var(--yw)">50万元</strong>设计全球化资产配置策略，核心目标是在<strong style="color:var(--gn)">五年投资周期</strong>内实现<strong style="color:var(--rd)">年化10%</strong>的稳定收益，同时将最大回撤严格控制在<strong style="color:var(--ac2)">5%以内</strong>。方案全部通过ETF和基金实现，不涉及任何个股交易。</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏆 推荐策略：增强全天候 + 动态再平衡</div>
+    <div class="grid2">
+      <div><h4 style="margin-bottom:12px;color:var(--ac2)">核心配置（50%）- ¥250,000</h4><div class="chart-box" style="height:300px"><canvas id="coreChart"></canvas></div></div>
+      <div><h4 style="margin-bottom:12px;color:var(--ac2)">卫星配置（50%）- ¥250,000</h4><div class="chart-box" style="height:300px"><canvas id="satChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 具体资产配置明细</div>
+    <div class="alloc-bar" id="allocBar"></div>
+    <div class="legend" id="allocLegend"></div>
+    <div class="table-wrap" style="margin-top:16px"><table id="allocTable"><thead><tr><th>资产类别</th><th>具体标的</th><th>国内代码</th><th>配置比例</th><th>配置金额</th><th>预期收益</th><th>角色</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚖️ 再平衡规则</div>
+    <div class="grid2">
+      <div class="info-box green"><h4 style="color:var(--cy);margin-bottom:12px">📅 定期再平衡</h4><ul><li>每<strong style="color:var(--tx)">季度末</strong>（3/6/9/12月最后一周）检查配置偏离</li><li>偏离目标权重<strong style="color:var(--tx)">超过3%</strong>时执行再平衡</li><li>交易成本估算：每次约¥200-500</li></ul></div>
+      <div class="info-box red"><h4 style="color:var(--og);margin-bottom:12px">🚨 触发式再平衡</h4><ul><li>组合总回撤达到<strong style="color:var(--rd)">-3%</strong>时启动防御模式</li><li>单一资产月跌幅超<strong style="color:var(--rd)">-8%</strong>时减仓至50%</li><li>VIX超过<strong style="color:var(--rd)">30</strong>时增加现金和黄金到40%以上</li><li>200日均线信号：跌破均线的资产减半配置</li></ul></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎯 五年资产增长预测</div>
+    <div class="chart-box" style="height:350px"><canvas id="projChart"></canvas></div>
+    <div class="grid4" style="margin-top:16px">
+      <div class="stat-card"><div class="label">第1年末</div><div class="value" style="color:var(--gn);font-size:1.5em">¥55.0万</div></div>
+      <div class="stat-card"><div class="label">第2年末</div><div class="value" style="color:var(--gn);font-size:1.5em">¥60.5万</div></div>
+      <div class="stat-card"><div class="label">第3年末</div><div class="value" style="color:var(--gn);font-size:1.5em">¥66.6万</div></div>
+      <div class="stat-card hl"><div class="label">第5年末</div><div class="value" style="color:var(--rd);font-size:1.5em">¥80.5万</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🛡️ 风险管理框架</div>
+    <div class="grid3">
+      <div style="padding:16px;background:var(--sf2);border-radius:12px;text-align:center"><div style="font-size:2em;margin-bottom:8px">🎚️</div><h4 style="color:var(--gn);margin-bottom:8px">第一层：配置分散</h4><p style="font-size:.85em;color:var(--tx2)">8种低相关资产类别，覆盖股票、债券、商品、现金四大象限</p></div>
+      <div style="padding:16px;background:var(--sf2);border-radius:12px;text-align:center"><div style="font-size:2em;margin-bottom:8px">📐</div><h4 style="color:var(--yw);margin-bottom:8px">第二层：动态调仓</h4><p style="font-size:.85em;color:var(--tx2)">趋势跟踪+均线系统，及时规避下行风险，捕捉上行机会</p></div>
+      <div style="padding:16px;background:var(--sf2);border-radius:12px;text-align:center"><div style="font-size:2em;margin-bottom:8px">🚧</div><h4 style="color:var(--rd);margin-bottom:8px">第三层：硬止损</h4><p style="font-size:.85em;color:var(--tx2)">组合级别5%硬止损，触发后转为货币基金等待恢复</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 5. 持仓记录 ===== -->
+<div class="section" id="sec-tracker">
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">💼</div> 持仓管理与交易记录</div>
+    <div class="btn-group"><button class="btn btn-primary" onclick="showAddPosition()">➕ 添加持仓</button><button class="btn btn-success" onclick="showAddTrade()">📝 记录交易</button><button class="btn btn-outline" onclick="exportPositions()">📥 导出</button></div>
+  </div>
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="stat-card hl"><div class="label">总资产</div><div class="value" id="totalAsset" style="color:var(--rd)">¥500,000</div></div>
+    <div class="stat-card"><div class="label">总收益</div><div class="value" id="totalProfit" style="color:var(--gn)">¥0</div></div>
+    <div class="stat-card"><div class="label">收益率</div><div class="value" id="totalReturn" style="color:var(--gn)">0%</div></div>
+    <div class="stat-card"><div class="label">持仓数量</div><div class="value" id="posCount" style="color:var(--ac2)">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 当前持仓</div>
+    <div class="chart-box" style="height:300px;margin-bottom:16px"><canvas id="posChart"></canvas></div>
+    <div class="table-wrap"><table><thead><tr><th>资产名称</th><th>代码</th><th>买入成本</th><th>当前市值</th><th>持仓占比</th><th>收益率</th><th>操作</th></tr></thead><tbody id="posTable"></tbody></table></div>
+  </div>
+  <div class="card"><div class="card-title">📜 交易记录</div><div class="table-wrap"><table><thead><tr><th>日期</th><th>类型</th><th>资产</th><th>金额</th><th>备注</th></tr></thead><tbody id="tradeTable"></tbody></table></div></div>
+  <div class="card" id="addPosForm" style="display:none;border-color:var(--ac)">
+    <div class="card-title">➕ 添加新持仓</div>
+    <div class="grid3"><div class="form-group"><label>资产名称</label><input id="posName" placeholder="如：纳斯达克100ETF"></div><div class="form-group"><label>代码</label><input id="posCode" placeholder="如：159941"></div><div class="form-group"><label>买入金额</label><input id="posAmount" type="number" placeholder="50000"></div></div>
+    <div class="btn-group"><button class="btn btn-success" onclick="addPosition()">✅ 确认添加</button><button class="btn btn-outline" onclick="hideAddPosition()">取消</button></div>
+  </div>
+  <div class="card" id="addTradeForm" style="display:none;border-color:var(--gn)">
+    <div class="card-title">📝 记录交易</div>
+    <div class="grid3"><div class="form-group"><label>交易日期</label><input id="tradeDate" type="date"></div><div class="form-group"><label>交易类型</label><select id="tradeType"><option value="buy">买入</option><option value="sell">卖出</option><option value="rebalance">再平衡</option></select></div><div class="form-group"><label>资产名称</label><input id="tradeName" placeholder="纳斯达克100ETF"></div></div>
+    <div class="grid2"><div class="form-group"><label>金额</label><input id="tradeAmount" type="number" placeholder="10000"></div><div class="form-group"><label>备注</label><input id="tradeNote" placeholder="季度再平衡"></div></div>
+    <div class="btn-group"><button class="btn btn-success" onclick="addTrade()">✅ 确认记录</button><button class="btn btn-outline" onclick="hideAddTrade()">取消</button></div>
+  </div>
+</div>
+
+<!-- ===== 6. 策略提醒 ===== -->
+<div class="section" id="sec-reminders">
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(245,158,11,.2)">⏰</div> 策略提醒与日程管理</div>
+    <div class="btn-group"><button class="btn btn-primary" onclick="showAddReminder()">➕ 添加提醒</button><button class="btn btn-outline" onclick="loadDefReminders()">🔄 加载默认提醒</button></div>
+  </div>
+  <div class="card"><div class="card-title">📅 即将到来的提醒</div><div id="reminderList"></div></div>
+  <div class="card"><div class="card-title">📆 年度再平衡日历</div><div class="chart-box" style="height:350px"><canvas id="calChart"></canvas></div></div>
+  <div class="card" id="addReminderForm" style="display:none;border-color:var(--yw)">
+    <div class="card-title">➕ 添加新提醒</div>
+    <div class="grid3"><div class="form-group"><label>提醒标题</label><input id="remTitle" placeholder="如：季度再平衡"></div><div class="form-group"><label>提醒日期</label><input id="remDate" type="date"></div><div class="form-group"><label>重复频率</label><select id="remRepeat"><option value="none">不重复</option><option value="monthly">每月</option><option value="quarterly">每季度</option><option value="yearly">每年</option></select></div></div>
+    <div class="form-group"><label>详细描述</label><textarea id="remDesc" rows="2" placeholder="检查各资产偏离度，偏离>3%执行再平衡"></textarea></div>
+    <div class="btn-group"><button class="btn btn-success" onclick="addReminder()">✅ 确认</button><button class="btn btn-outline" onclick="hideAddReminder()">取消</button></div>
+  </div>
+  <div class="card"><div class="card-title">✅ 每月投资检查清单</div><div id="checklist"></div></div>
+</div>
+
+</div>
+<script src="data.js"></script>
+<script src="backtest.js"></script>
+<script src="app.js"></script>
+<script src="modules.js"></script>
+</body>
+</html>

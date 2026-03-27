@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QDII基金实时溢价率监控</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p { font-size: 1.1em; opacity: 0.9; }
+
+        .update-time {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover { transform: translateY(-5px); }
+
+        .stat-number { font-size: 2.5em; font-weight: bold; margin-bottom: 5px; }
+        .stat-label { color: #666; font-size: 1.1em; }
+
+        .positive { color: #e74c3c; }
+        .negative { color: #27ae60; }
+        .neutral  { color: #3498db; }
+
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-section label { font-weight: bold; }
+
+        .filter-section input {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .filter-section input:focus { outline: none; border-color: #667eea; }
+        .search-input { width: 300px; }
+
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th, td { padding: 15px; text-align: left; }
+
+        th {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover { background: rgba(255,255,255,0.1); }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.3s;
+        }
+
+        tbody tr:hover { background: #f8f9fa; }
+        tbody tr:last-child { border-bottom: none; }
+
+        .premium-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .premium-high    { background: #ffebee; color: #c62828; }
+        .premium-medium   { background: #fff3e0; color: #ef6c00; }
+        .premium-low      { background: #e8f5e9; color: #2e7d32; }
+        .premium-negative { background: #e3f2fd; color: #1565c0; }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+            opacity: 0.9;
+        }
+
+        .footer a { color: #fff; text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            table { font-size: 0.9em; }
+            th, td { padding: 10px; }
+            .search-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>QDII基金实时溢价率监控</h1>
+            <p>实时监控QDII基金场内交易价格与基金净值的溢价情况</p>
+            <div class="update-time">
+                <span id="last-update">数据加载中...</span>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-count">-</div>
+                <div class="stat-label">基金总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number positive" id="premium-count">-</div>
+                <div class="stat-label">溢价基金</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number negative" id="discount-count">-</div>
+                <div class="stat-label">折价基金</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avg-premium">-</div>
+                <div class="stat-label">平均溢价率</div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <label for="search">搜索:</label>
+            <input type="text" id="search" class="search-input" placeholder="输入基金代码或名称...">
+            <label for="min-premium">最小溢价率(%):</label>
+            <input type="number" id="min-premium" step="0.1" value="-100" style="width:90px">
+            <label for="max-premium">最大溢价率(%):</label>
+            <input type="number" id="max-premium" step="0.1" value="100" style="width:90px">
+        </div>
+
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">序号</th>
+                    <th onclick="sortTable(1)">基金代码</th>
+                    <th onclick="sortTable(2)">基金名称</th>
+                    <th onclick="sortTable(3)">场内价格</th>
+                    <th onclick="sortTable(4)">基金净值</th>
+                    <th onclick="sortTable(5)">溢价率 &#x25B2;&#x25BC;</th>
+                    <th onclick="sortTable(6)">涨幅</th>
+                    <th onclick="sortTable(7)">成交额</th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+
+        <div class="footer">
+            <p>数据来源: <a href="https://www.jisilu.cn/data/qdii/" target="_blank">集思录</a> |
+            溢价率 = (场内价格 - 基金净值) / 基金净值 × 100%</p>
+            <p style="margin-top:10px;font-size:0.9em;">
+                ⚠️ 风险提示: 高溢价买入风险巨大，请谨慎投资
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ====== 数据直接内嵌在 HTML 中，双击即可打开 ======
+        var QDII_DATA = [
+  {
+    "fund_code": "513870",
+    "fund_name": "纳指ETF富国",
+    "price": 1.234,
+    "nav": 1.150,
+    "premium_rate": 7.30,
+    "increase_rate": "+2.35%",
+    "volume": "125.6万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159941",
+    "fund_name": "纳指ETF",
+    "price": 1.567,
+    "nav": 1.520,
+    "premium_rate": 3.09,
+    "increase_rate": "+1.82%",
+    "volume": "234.5万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513100",
+    "fund_name": "纳指ETF国泰",
+    "price": 2.345,
+    "nav": 2.280,
+    "premium_rate": 2.85,
+    "increase_rate": "+1.56%",
+    "volume": "189.3万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159509",
+    "fund_name": "纳指科技ETF",
+    "price": 0.987,
+    "nav": 0.920,
+    "premium_rate": 7.28,
+    "increase_rate": "+3.21%",
+    "volume": "456.7万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513050",
+    "fund_name": "中概互联ETF",
+    "price": 0.678,
+    "nav": 0.710,
+    "premium_rate": -4.51,
+    "increase_rate": "-1.23%",
+    "volume": "567.8万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159605",
+    "fund_name": "中概互联ETF",
+    "price": 0.543,
+    "nav": 0.560,
+    "premium_rate": -3.04,
+    "increase_rate": "-0.98%",
+    "volume": "345.6万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513060",
+    "fund_name": "恒生医疗ETF",
+    "price": 0.456,
+    "nav": 0.450,
+    "premium_rate": 1.33,
+    "increase_rate": "+0.75%",
+    "volume": "123.4万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159892",
+    "fund_name": "恒生科技ETF",
+    "price": 0.389,
+    "nav": 0.400,
+    "premium_rate": -2.75,
+    "increase_rate": "-0.45%",
+    "volume": "234.5万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513030",
+    "fund_name": "德国ETF",
+    "price": 1.234,
+    "nav": 1.100,
+    "premium_rate": 12.18,
+    "increase_rate": "+4.56%",
+    "volume": "89.7万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513080",
+    "fund_name": "法国ETF",
+    "price": 1.123,
+    "nav": 1.050,
+    "premium_rate": 6.95,
+    "increase_rate": "+2.34%",
+    "volume": "67.8万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159529",
+    "fund_name": "标普消费ETF",
+    "price": 2.567,
+    "nav": 2.200,
+    "premium_rate": 16.68,
+    "increase_rate": "+5.67%",
+    "volume": "156.7万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513500",
+    "fund_name": "标普500ETF",
+    "price": 1.890,
+    "nav": 1.780,
+    "premium_rate": 6.18,
+    "increase_rate": "+1.89%",
+    "volume": "245.6万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159612",
+    "fund_name": "标普500ETF",
+    "price": 1.456,
+    "nav": 1.390,
+    "premium_rate": 4.75,
+    "increase_rate": "+1.45%",
+    "volume": "178.9万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "513520",
+    "fund_name": "日经225ETF",
+    "price": 1.678,
+    "nav": 1.550,
+    "premium_rate": 8.26,
+    "increase_rate": "+3.45%",
+    "volume": "267.8万",
+    "update_time": "2026-03-27 13:10:00"
+  },
+  {
+    "fund_code": "159866",
+    "fund_name": "日经225ETF",
+    "price": 1.345,
+    "nav": 1.280,
+    "premium_rate": 5.08,
+    "increase_rate": "+2.67%",
+    "volume": "198.7万",
+    "update_time": "2026-03-27 13:10:00"
+  }
+];
+
+        var allData = QDII_DATA;
+        var currentSort = { column: -1, ascending: true };
+
+        function init() {
+            updateStats(allData);
+            renderTable(allData);
+            updateLastUpdateTime(allData);
+
+            document.getElementById('search').addEventListener('input', filterData);
+            document.getElementById('min-premium').addEventListener('input', filterData);
+            document.getElementById('max-premium').addEventListener('input', filterData);
+        }
+
+        function updateStats(data) {
+            var total = data.length;
+            var premium = data.filter(function(d){ return d.premium_rate > 0; }).length;
+            var discount = data.filter(function(d){ return d.premium_rate < 0; }).length;
+            var sum = data.reduce(function(s, d){ return s + d.premium_rate; }, 0);
+            var avg = total > 0 ? sum / total : 0;
+
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('premium-count').textContent = premium;
+            document.getElementById('discount-count').textContent = discount;
+            var avgEl = document.getElementById('avg-premium');
+            avgEl.textContent = avg.toFixed(2) + '%';
+            avgEl.className = 'stat-number ' + (avg > 0 ? 'positive' : 'negative');
+        }
+
+        function renderTable(data) {
+            var tbody = document.getElementById('table-body');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;">没有符合条件的数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map(function(item, i){
+                var cls = getPremiumClass(item.premium_rate);
+                return '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td><strong>' + item.fund_code + '</strong></td>' +
+                    '<td>' + item.fund_name + '</td>' +
+                    '<td>' + item.price.toFixed(3) + '</td>' +
+                    '<td>' + item.nav.toFixed(3) + '</td>' +
+                    '<td><span class="premium-badge ' + cls + '">' + item.premium_rate.toFixed(2) + '%</span></td>' +
+                    '<td>' + item.increase_rate + '</td>' +
+                    '<td>' + item.volume + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        function getPremiumClass(p) {
+            if (p > 5)  return 'premium-high';
+            if (p > 2)  return 'premium-medium';
+            if (p >= 0) return 'premium-low';
+            return 'premium-negative';
+        }
+
+        function updateLastUpdateTime(data) {
+            if (data.length > 0 && data[0].update_time) {
+                document.getElementById('last-update').textContent =
+                    '更新时间: ' + data[0].update_time;
+            }
+        }
+
+        function sortTable(col) {
+            var keys = ['index','fund_code','fund_name','price','nav','premium_rate','increase_rate','volume'];
+            var key = keys[col];
+            if (currentSort.column === col) {
+                currentSort.ascending = !currentSort.ascending;
+            } else {
+                currentSort.column = col;
+                currentSort.ascending = true;
+            }
+            var sorted = allData.slice().sort(function(a, b){
+                if (key === 'index') return 0;
+                var va = a[key], vb = b[key];
+                if (typeof va === 'number') {
+                    return currentSort.ascending ? va - vb : vb - va;
+                }
+                va = String(va); vb = String(vb);
+                return currentSort.ascending ? va.localeCompare(vb) : vb.localeCompare(va);
+            });
+            renderTable(sorted);
+        }
+
+        function filterData() {
+            var term = document.getElementById('search').value.toLowerCase();
+            var minP = parseFloat(document.getElementById('min-premium').value) || -100;
+            var maxP = parseFloat(document.getElementById('max-premium').value) || 100;
+
+            var filtered = allData.filter(function(d){
+                var matchSearch = d.fund_code.toLowerCase().indexOf(term) >= 0 ||
+                                  d.fund_name.toLowerCase().indexOf(term) >= 0;
+                var matchPrem = d.premium_rate >= minP && d.premium_rate <= maxP;
+                return matchSearch && matchPrem;
+            });
+            renderTable(filtered);
+        }
+
+        init();
+    </script>
+</body>
+</html>
