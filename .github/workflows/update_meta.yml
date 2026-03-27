@@ -1,0 +1,42 @@
+name: 更新纳指七姐妹观点
+
+on:
+  # 每天 UTC 00:00 运行（北京时间 08:00）
+  schedule:
+    - cron: '0 0 * * *'
+  
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 设置 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: 安装依赖
+        run: |
+          pip install requests beautifulsoup4
+      
+      - name: 更新观点数据
+        run: python update_opinions.py
+        env:
+          # 可以添加实际的 API 密钥
+          # X_API_TOKEN: ${{ secrets.X_API_TOKEN }}
+      
+      - name: 提交更改
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add meta/data.js
+          git diff --staged --quiet || git commit -m "chore: 自动更新纳指七姐妹观点数据 [skip ci]"
+          git push

@@ -461,7 +461,6 @@ function initBacktestTab() {
             ticks: { color: '#64748b', callback: v => v.toFixed(1) + '%' },
             grid: { color: 'rgba(255,255,255,0.05)' }
           }
-          }
         }
       }
     });
