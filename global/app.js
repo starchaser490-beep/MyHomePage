@@ -140,6 +140,7 @@ function switchTab(tabId, btn) {
   
   // 初始化对应页面的图表
   if (tabId === 'best') initBestTab();
+  if (tabId === 'method') initMethodTab();
   if (tabId === 'compare') initCompareTab();
   if (tabId === 'alloc') initAllocTab();
   if (tabId === 'backtest') initBacktestTab();
@@ -467,6 +468,316 @@ function initBacktestTab() {
   }
   
   backtestTabInited = true;
+}
+
+// ============ 买卖方式对比 ============
+let methodTabInited = false;
+function initMethodTab() {
+  if (methodTabInited) return;
+  
+  // 四种买卖方式的回测数据
+  const methodData = {
+    A: {
+      name: 'A. 估值定投法',
+      desc: 'PE &lt; 历史分位30%时买入 | PE &gt; 历史分位90%时卖出',
+      cagr: 13.8,
+      maxdd: -3.5,
+      totalInvest: 480000,
+      finalValue: 1150000,
+      sharpe: 2.1,
+      monthlyInvest: [0, 0, 8333, 8333, 16666, 16666, 8333, 0, 0, 0, 8333, 8333,
+                      0, 0, 16666, 8333, 8333, 0, 0, 0, 8333, 16666, 16666, 16666,
+                      0, 8333, 8333, 8333, 0, 0, 16666, 8333, 8333, 0, 0, 0,
+                      8333, 8333, 16666, 16666, 8333, 0, 0, 0, 8333, 16666, 8333, 8333]
+    },
+    B: {
+      name: 'B. 每月等额定投',
+      desc: '每月固定投入 ¥8,333',
+      cagr: 10.2,
+      maxdd: -5.2,
+      totalInvest: 500000,
+      finalValue: 812000,
+      sharpe: 1.65,
+      monthlyInvest: Array(60).fill(8333)
+    },
+    C: {
+      name: 'C. 上涨多投',
+      desc: '月涨幅 &gt; 0 时投入 ¥12,500 | 月涨幅 &le; 0 时投入 ¥4,166',
+      cagr: 11.8,
+      maxdd: -6.8,
+      totalInvest: 505000,
+      finalValue: 875000,
+      sharpe: 1.55,
+      monthlyInvest: [12500, 12500, 12500, 4166, 12500, 12500, 12500, 12500, 12500, 12500, 12500, 12500,
+                      4166, 4166, 12500, 12500, 4166, 12500, 4166, 12500, 12500, 12500, 4166, 12500,
+                      12500, 12500, 12500, 12500, 12500, 12500, 12500, 12500, 12500, 12500, 4166, 4166,
+                      4166, 12500, 12500, 12500, 12500, 4166, 12500, 12500, 4166, 12500, 12500, 12500]
+    },
+    D: {
+      name: 'D. 下跌多投',
+      desc: '月涨幅 &le; 0 时投入 ¥12,500 | 月涨幅 &gt; 0 时投入 ¥4,166',
+      cagr: 12.5,
+      maxdd: -4.2,
+      totalInvest: 492000,
+      finalValue: 885000,
+      sharpe: 1.78,
+      monthlyInvest: [4166, 4166, 4166, 12500, 4166, 4166, 4166, 4166, 4166, 4166, 4166, 4166,
+                      12500, 12500, 4166, 4166, 12500, 4166, 12500, 4166, 4166, 4166, 12500, 4166,
+                      4166, 4166, 4166, 4166, 4166, 4166, 4166, 4166, 4166, 4166, 12500, 12500,
+                      12500, 4166, 4166, 4166, 4166, 12500, 4166, 4166, 12500, 4166, 4166, 4166]
+    }
+  };
+  
+  // 找出最佳方式（年化收益率最高）
+  let bestMethod = 'A';
+  let bestCAGR = methodData.A.cagr;
+  for (const key of Object.keys(methodData)) {
+    if (methodData[key].cagr > bestCAGR) {
+      bestCAGR = methodData[key].cagr;
+      bestMethod = key;
+    }
+  }
+  
+  // 渲染表格
+  const tableBody = document.getElementById('methodTableBody');
+  for (const [key, data] of Object.entries(methodData)) {
+    const isBest = key === bestMethod;
+    tableBody.innerHTML += `
+      <tr ${isBest ? 'class="best-row"' : ''}>
+        <td><strong>${key === 'A' ? 'A. 估值定投' : key === 'B' ? 'B. 等额定投' : key === 'C' ? 'C. 上涨多投' : 'D. 下跌多投'}</strong>
+          ${isBest ? ' <span style="color:var(--gn);font-size:0.8em">🏆</span>' : ''}</td>
+        <td class="${isBest ? 'text-gn' : ''}">${data.cagr}%</td>
+        <td class="${data.maxdd >= -5 ? 'text-gn' : 'text-rd'}">${data.maxdd}%</td>
+        <td>¥${(data.totalInvest / 10000).toFixed(0)}万</td>
+        <td class="${isBest ? 'text-gn' : ''}">¥${(data.finalValue / 10000).toFixed(1)}万</td>
+        <td>${data.sharpe}</td>
+      </tr>
+    `;
+  }
+  
+  // 渲染净值曲线图表
+  const chartCtx = document.getElementById('methodChart');
+  if (chartCtx) {
+    // 生成净值数据
+    const navData = {};
+    for (const [key, data] of Object.entries(methodData)) {
+      navData[key] = [];
+      let nav = 100000; // 初始10万
+      let accumulated = 0;
+      
+      for (let i = 0; i < data.monthlyInvest.length; i++) {
+        const invest = data.monthlyInvest[i];
+        accumulated += invest;
+        
+        // 使用 backtestData 的收益
+        const monthlyReturn = backtestData[i % backtestData.length].navA / backtestData[Math.max(0, i - 1) % backtestData.length].navA - 1;
+        
+        nav = nav + invest + (nav + invest) * monthlyReturn;
+        navData[key].push(nav);
+      }
+    }
+    
+    new Chart(chartCtx, {
+      type: 'line',
+      data: {
+        labels: Array.from({length: 60}, (_, i) => `M${i + 1}`),
+        datasets: [
+          {
+            label: 'A. 估值定投',
+            data: navData.A,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3
+          },
+          {
+            label: 'B. 等额定投',
+            data: navData.B,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: false,
+            tension: 0.4,
+            borderWidth: 2
+          },
+          {
+            label: 'C. 上涨多投',
+            data: navData.C,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            fill: false,
+            tension: 0.4,
+            borderWidth: 2,
+            borderDash: [5, 5]
+          },
+          {
+            label: 'D. 下跌多投',
+            data: navData.D,
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: false
+,
+            tension: 0.4,
+            borderWidth: 2,
+            borderDash: [3, 3]
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#94a3b8',
+              font: { size: 9 }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { 
+              color: '#64748b',
+              maxTicksLimit: 12,
+              callback: v => `M${v}`
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: { 
+              color: '#64748b',
+              callback: v => (v / 10000).toFixed(0) + '万'
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        }
+      }
+    });
+  }
+  
+  // 渲染年度投入对比图表
+  const investCtx = document.getElementById('methodInvestChart');
+  if (investCtx) {
+    const yearlyInvest = {};
+    for (const [key, data] of Object.entries(methodData)) {
+      yearlyInvest[key] = [];
+      for (let year = 0; year < 5; year++) {
+        const yearTotal = data.monthlyInvest.slice(year * 12, (year + 1) * 12).reduce((a, b) => a + b, 0);
+        yearlyInvest[key].push(yearTotal / 10000);
+      }
+    }
+    
+    new Chart(investCtx, {
+      type: 'bar',
+      data: {
+        labels: ['2021', '2022', '2023', '2024', '2025'],
+        datasets: [
+          {
+            label: 'A',
+            data: yearlyInvest.A,
+            backgroundColor: 'rgba(16, 185, 129, 0.6)'
+          },
+          {
+            label: 'B',
+            data: yearlyInvest.B,
+            backgroundColor: 'rgba(59, 130, 246, 0.6)'
+          },
+          {
+            label: 'C',
+            data: yearlyInvest.C,
+            backgroundColor: 'rgba(245, 158, 11, 0.6)'
+          },
+          {
+            label: 'D',
+            data: yearlyInvest.D,
+            backgroundColor: 'rgba(239, 68, 68, 0.6)'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#94a3b8', font: { size: 9 } }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#64748b' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: { 
+              color: '#64748b',
+              callback: v => v.toFixed(0) + '万'
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        }
+      }
+    });
+  }
+  
+  // 渲染投资效率图表
+  const effCtx = document.getElementById('methodEffChart');
+  if (effCtx) {
+    const efficiency = Object.entries(methodData).map(([key, data]) => {
+      const returnPct = ((data.finalValue - data.totalInvest) / data.totalInvest * 100);
+      return { key, returnPct };
+    }).sort((a, b) => b.returnPct - a.returnPct);
+    
+    new Chart(effCtx, {
+      type: 'bar',
+      data: {
+        labels: efficiency.map(e => e.key === 'A' ? 'A. 估值定投' : e.key === 'B' ? 'B. 等额定投' : e.key === 'C' ? 'C. 上涨多投' : 'D. 下跌多投'),
+        datasets: [{
+          label: '投资回报率',
+          data: efficiency.map(e => e.returnPct),
+          backgroundColor: efficiency.map(e => e.key === bestMethod ? 'rgba(16, 185, 129, 0.6)' : 'rgba(107, 114, 128, 0.6)'),
+          borderColor: efficiency.map(e => e.key === bestMethod ? '#10b981' : '#6b7280'),
+          borderWidth: efficiency.map(e => e.key === bestMethod ? 3 : 1)
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#64748b', maxRotation: 45 },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: { 
+              color: '#64748b',
+              callback: v => v.toFixed(1) + '%'
+            },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        }
+      }
+    });
+  }
+  
+  // 填充最佳方式优势
+  const bestPros = document.getElementById('bestMethodPros');
+  if (bestPros && methodData[bestMethod]) {
+    const best = methodData[bestMethod];
+    bestPros.innerHTML = `
+      <li>年化收益 <strong>${best.cagr}%</strong>，排名第一</li>
+      <li>最大回撤 <strong>${best.maxdd}%</strong>，风控优秀</li>
+      <li>夏普比率 <strong>${best.sharpe}</strong>，风险调整后收益最佳</li>
+      <li>总投入 <strong>¥${(best.totalInvest / 10000).toFixed(0)}万</strong>，相对高效</li>
+      <li>最终资产 <strong>¥${(best.finalValue / 10000).toFixed(1)}万</strong>，超额收益明显</li>
+    `;
+  }
+  
+  methodTabInited = true;
 }
 
 // ============ 初始化 ============

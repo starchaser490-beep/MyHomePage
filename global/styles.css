@@ -524,3 +524,50 @@ tr:hover td { background: rgba(59, 130, 246, .05); }
   background: rgba(239, 68, 68, .2);
   color: var(--rd);
 }
+
+/* Method List */
+.method-list { display: grid; gap: 10px; }
+
+.method-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(0,0,0,.2);
+  border-radius: 10px;
+  align-items: flex-start;
+}
+
+.method-badge {
+  width: 32px;
+  height: 32px;
+  background: var(--ac);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.method-item.method-a .method-badge { background: #10b981; }
+.method-item.method-b .method-badge { background: #3b82f6; }
+.method-item.method-c .method-badge { background: #f59e0b; }
+.method-item.method-d .method-badge { background: #ef4444; }
+
+.method-content { flex: 1; }
+.method-title { font-weight: 600; margin-bottom: 4px; font-size: 0.95em; }
+.method-desc { color: var(--tx2); font-size: 0.8em; line-height: 1.4; }
+
+/* Comparison Table Best Row */
+table .best-row {
+  background: rgba(16, 185, 129, 0.1);
+  font-weight: 600;
+}
+
+table .best-row::before {
+  content: '🏆 ';
+  color: var(--gn);
+}
+
+table .text-gn { color: var(--gn); }
+table .text-rd { color: var(--rd); }

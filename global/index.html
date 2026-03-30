@@ -24,6 +24,7 @@
 <!-- Tabs -->
 <div class="tabs">
   <button class="tab active" onclick="switchTab('best',this)">🏆 最佳策略</button>
+  <button class="tab" onclick="switchTab('method',this)">💰 买卖方式</button>
   <button class="tab" onclick="switchTab('compare',this)">📊 策略对比</button>
   <button class="tab" onclick="switchTab('alloc',this)">💼 配置明细</button>
   <button class="tab" onclick="switchTab('backtest',this)">📈 回测结果</button>
@@ -179,6 +180,105 @@
     <div class="card-title">净值曲线对比</div>
     <div class="chart-box">
       <canvas id="compareChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 买卖方式对比 ===== -->
+<div class="section" id="sec-method">
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(139,92,246,.2)">💰</div>买卖方式对比（基于策略A配置）</div>
+    <p style="color:var(--tx2);font-size:0.85em;margin-bottom:12px">对比四种不同的买卖方式，使用相同的资产配置组合</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">方式说明</div>
+    <div class="method-list">
+      <div class="method-item method-a">
+        <div class="method-badge">A</div>
+        <div class="method-content">
+          <div class="method-title">估值定投法</div>
+          <div class="method-desc">PE &lt; 历史分位30%时买入 &nbsp;|&nbsp; PE &gt; 历史分位90%时卖出</div>
+        </div>
+      </div>
+      <div class="method-item method-b">
+        <div class="method-badge">B</div>
+        <div class="method-content">
+          <div class="method-title">每月等额定投</div>
+          <div class="method-desc">每月固定投入 ¥8,333，不考虑市场估值</div>
+        </div>
+      </div>
+      <div class="method-item method-c">
+        <div class="method-badge">C</div>
+        <div class="method-content">
+          <div class="method-title">上涨多投</div>
+          <div class="method-desc">月涨幅 &gt; 0 时投入 ¥12,500 &nbsp;|&nbsp; 月涨幅 &le; 0 时投入 ¥4,166</div>
+        </div>
+      </div>
+      <div class="method-item method-d">
+        <div class="method-badge">D</div>
+        <div class="method-content">
+          <div class="method-title">下跌多投</div>
+          <div class="method-desc">月涨幅 &le; 0 时投入 ¥12,500 &nbsp;|&nbsp; 月涨幅 &gt; 0 时投入 ¥4,166</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="comparison-table">
+    <table>
+      <thead>
+        <tr>
+          <th>方式</th>
+          <th>年化收益</th>
+          <th>最大回撤</th>
+          <th>总投入</th>
+          <th>最终资产</th>
+          <th>夏普</th>
+        </tr>
+      </thead>
+      <tbody id="methodTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">净值曲线对比</div>
+    <div class="chart-box">
+      <canvas id="methodChart"></canvas>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">年度投入对比</div>
+      <div class="chart-box">
+        <canvas id="methodInvestChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">投资效率（收益率/投入）</div>
+      <div class="chart-box">
+        <canvas id="methodEffChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">💡</div>关键发现</div>
+    <div class="grid2">
+      <div class="info-box green">
+        <h4>✅ 最优方式</h4>
+        <ul id="bestMethodPros"></ul>
+      </div>
+      <div class="info-box red">
+        <h4>⚠️ 风险提示</h4>
+        <ul>
+          <li>方式A（估值定投）需要等待极端低估值机会</li>
+          <li>方式C（上涨多投）追涨风险较高</li>
+          <li>方式D（下跌多投）可能长时间空仓等待</li>
+          <li>方式B（等额定投）最简单但收益一般</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
