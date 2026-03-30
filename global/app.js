@@ -485,10 +485,10 @@ function initMethodTab() {
       totalInvest: 480000,
       finalValue: 1150000,
       sharpe: 2.1,
-      monthlyInvest: [0, 0, 8333, 8333, 16666, 16666, 8333, 0, 0, 0, 8333, 8333,
-                      0, 0, 16666, 8333, 8333, 0, 0, 0, 8333, 16666, 16666, 16666,
-                      0, 8333, 8333, 8333, 0, 0, 16666, 8333, 8333, 0, 0, 0,
-                      8333, 8333, 16666, 16666, 8333, 0, 0, 0, 8333, 16666, 8333, 8333]
+      monthlyInvest: [0, 0, 16666, 16666, 25000, 25000, 16666, 0, 0, 0, 16666, 16666,
+                      0, 0, 25000, 16666, 16666, 0, 0, 0, 16666, 25000, 25000, 25000,
+                      0, 16666, 16666, 16666, 0, 0, 25000, 16666, 16666, 0, 0, 0,
+                      16666, 16666, 25000, 25000, 16666, 0, 0, 0, 16666, 25000, 16666, 16666]
     },
     B: {
       name: 'B. 每月等额定投',
@@ -544,8 +544,7 @@ function initMethodTab() {
     const isBest = key === bestMethod;
     tableBody.innerHTML += `
       <tr ${isBest ? 'class="best-row"' : ''}>
-        <td><strong>${key === 'A' ? 'A. 估值定投' : key === 'B' ? 'B. 等额定投' : key === 'C' ? 'C. 上涨多投' : 'D. 下跌多投'}</strong>
-          ${isBest ? ' <span style="color:var(--gn);font-size:0.8em">🏆</span>' : ''}</td>
+        <td>${isBest ? '<span style="color:var(--gn)">🏆</span> ' : ''}<strong>${key === 'A' ? 'A. 估值定投' : key === 'B' ? 'B. 等额定投' : key === 'C' ? 'C. 上涨多投' : 'D. 下跌多投'}</strong></td>
         <td class="${isBest ? 'text-gn' : ''}">${data.cagr}%</td>
         <td class="${data.maxdd >= -5 ? 'text-gn' : 'text-rd'}">${data.maxdd}%</td>
         <td>¥${(data.totalInvest / 10000).toFixed(0)}万</td>
@@ -562,17 +561,20 @@ function initMethodTab() {
     const navData = {};
     for (const [key, data] of Object.entries(methodData)) {
       navData[key] = [];
-      let nav = 100000; // 初始10万
-      let accumulated = 0;
+      let nav = 0; // 从0开始，不设初始资金
       
       for (let i = 0; i < data.monthlyInvest.length; i++) {
         const invest = data.monthlyInvest[i];
-        accumulated += invest;
         
         // 使用 backtestData 的收益
         const monthlyReturn = backtestData[i % backtestData.length].navA / backtestData[Math.max(0, i - 1) % backtestData.length].navA - 1;
         
-        nav = nav + invest + (nav + invest) * monthlyReturn;
+        // 计算当前投资总额
+        const currentPortfolio = nav + invest;
+        
+        // 应用收益
+        nav = currentPortfolio * (1 + monthlyReturn);
+        
         navData[key].push(nav);
       }
     }
