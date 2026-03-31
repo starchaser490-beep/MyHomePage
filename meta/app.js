@@ -198,7 +198,7 @@ function initDetailView() {
           </div>
           <div style="text-align:center">
             <div style="font-size:0.7em;color:var(--tx2)">中性</div>
-            <div style="font-size:1.2em;font-weight:700;color:var(--yw)">${opinion.neutralCount}票</div>
+            <div style="font-size:1.2;em;font-weight:700;color:var(--yw)">${opinion.neutralCount}票</div>
           </div>
         </div>
         
@@ -210,6 +210,7 @@ function initDetailView() {
               <div class="opinion-item type-${o.type}">
                 <div class="blogger">${blogger ? blogger.avatar : ''} ${blogger ? blogger.name : 'Unknown'}</div>
                 <div class="text">${o.text}</div>
+                ${o.link ? `<div class="link">📎 <a href="${o.link}" target="_blank">${o.source || '来源'}</a></div>` : ''}
                 <div class="date">${o.date}</div>
               </div>
             `;
@@ -254,6 +255,22 @@ function initBloggersView() {
             <div class="value">${blogger.focus}</div>
           </div>
         </div>
+        ${blogger.winrateExplanation ? `
+          <div class="winrate-detail">
+            <div class="winrate-detail-title">📊 胜率说明</div>
+            <div class="winrate-detail-content">
+              <div>• 统计周期：<strong>${blogger.winrateExplanation.period}</strong></div>
+              <div>• 总观点数：<strong>${blogger.winrateExplanation.totalOpinions}</strong></div>
+              <div>• 正确观点：<strong>${blogger.winrateExplanation.correctOpinions}</strong></div>
+              <div>• 备注：<strong>${blogger.winrateExplanation.note}</strong></div>
+            </div>
+          </div>
+        ` : ''}
+        ${blogger.profileUrl ? `
+          <div class="profile-link">
+            <a href="${blogger.profileUrl}" target="_blank">🔗 查看博主主页</a>
+          </div>
+        ` : ''}
       </div>
     `;
   });

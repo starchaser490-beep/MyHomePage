@@ -377,3 +377,63 @@ body {
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--f1); }
 ::-webkit-scrollbar-thumb { background: var(--f2); border-radius: 3px; }
+
+/* Winrate Detail */
+.winrate-detail {
+  background: rgba(0,0,0,.3);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.winrate-detail-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.winrate-detail-content {
+  font-size: 0.85em;
+  color: var(--tx2);
+  line-height: 1.8;
+}
+
+.winrate-detail-content strong {
+  color: var(--tx);
+}
+
+/* Profile Link */
+.profile-link {
+  margin-top: 10px;
+}
+
+.profile-link a {
+  color: var(--ac2);
+  text-decoration: none;
+  font-size: 0.85em;
+  display: inline-block;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, .1);
+  border-radius: 6px;
+  transition: all .3s;
+}
+
+.profile-link a:hover {
+  background: rgba(59, 130, 246, .2);
+}
+
+/* Opinion Link */
+.opinion-item .link {
+  font-size: 0.8em;
+  color: var(--ac2);
+  margin-top: 4px;
+}
+
+.opinion-item .link a {
+  color: var(--ac2);
+  text-decoration: none;
+}
+
+.opinion-item .link a:hover {
+  text-decoration: underline;
+}
