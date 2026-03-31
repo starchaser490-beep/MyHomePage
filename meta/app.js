@@ -202,16 +202,29 @@ function initDetailView() {
           </div>
         </div>
         
-        <div style="font-weight:600;margin-bottom:8px">📝 最新观点</div>
+        <div style="font-weight:600;margin-bottom:12px">📝 最新观点</div>
         <div class="opinion-list">
           ${opinion.opinions.map(o => {
             const blogger = getBlogger(o.bloggerId);
+            const sentimentIcon = o.type === 'bull' ? '🟢 看多' : o.type === 'bear' ? '🔴 看空' : '🟡 中性';
             return `
               <div class="opinion-item type-${o.type}">
-                <div class="blogger">${blogger ? blogger.avatar : ''} ${blogger ? blogger.name : 'Unknown'}</div>
-                <div class="text">${o.text}</div>
-                ${o.link ? `<div class="link">📎 <a href="${o.link}" target="_blank">${o.source || '来源'}</a></div>` : ''}
-                <div class="date">${o.date}</div>
+                <div class="opinion-header">
+                  <div class="opinion-blogger">${blogger ? blogger.avatar : ''} ${blogger ? blogger.name : 'Unknown'}</div>
+                  <div class="opinion-date">${o.date}</div>
+                </div>
+                <div class="opinion-sentiment">${sentimentIcon}</div>
+                <div class="opinion-text">${o.text}</div>
+                <div class="opinion-links">
+                  <div class="opinion-link source-link">
+                    📎 <a href="${o.link}" target="_blank">${o.source || '来源'}</a>
+                  </div>
+                  ${o.postUrl ? `
+                    <div class="opinion-link post-link">
+                      💬 <a href="${o.postUrl}" target="_blank">博主原帖</a>
+                    </div>
+                  ` : ''}
+                </div>
               </div>
             `;
           }).join('')}
