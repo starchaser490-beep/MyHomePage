@@ -1,0 +1,99 @@
+name: 自动运行 TradingAgents 分析
+
+on:
+  # 每天 UTC 04:00 运行（北京时间 12:00）
+  schedule:
+    - cron: '0 4 * * *'
+  
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  run_tradingagents:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          path: 'tradingagents'
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 设置 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: 配置环境变量
+        run: |
+          cat > .env << 'EOF'
+          # LLM 配置（根据需要配置）
+          # OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          # GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+          # ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+          # XAI_API_KEY=${{ secrets.XAI_API_KEY }}
+          # OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+          # ALPHA_VANTAGE_API_KEY=${{ secrets.ALPHA_VANTAGE_API_KEY }}
+          
+          # 数据源配置
+          DATA_VENDORS='{"core_stock_apis": "yfinance", "technical_indicators": "yfinance", "fundamental_data": "yfinance", "news_data": "yfinance"}'
+          
+          # 模型配置
+          LLM_PROVIDER=${{ secrets.LLM_PROVIDER: 'openai' }}
+          DEEP_THINK_MODEL=${{ secrets.DEEP_THINK_MODEL: 'gpt-5.4' }}
+          QUICK_THINK_MODEL=${{ secrets.QUICK_THINK_MODEL: 'gpt-5.4-mini' }}
+          MAX_DEBATE_ROUNDS=${{ secrets.MAX_DEBATE_ROUNDS: 2 }}
+          
+          # 输出语言
+          OUTPUT_LANGUAGE=${{ secrets.OUTPUT_LANGUAGE: 'Chinese' }}
+          EOF
+      
+      - name: 安装依赖
+        run: |
+          pip install --upgrade -r requirements.txt
+      
+      - name: 运行 TradingAgents 分析 NVDA
+        run: |
+          python main.py "NVDA" "2026-04-08"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      
+      - name: 运行 TradingAgents 分析 AAPL
+        run: |
+          python main.py "AAPL" "2026-04-08"
+      
+      - name: 运行 TradingAgents 分析 MSFT
+        run: |
+          python main.py "MSFT" "2026-04-08"
+      
+      - name: 运行 TradingAgents 分析 AMZN
+        run: |
+          python main.py "AMZN" "2026-04-08"
+      
+      - name: 运行 TradingAgents 分析 GOOGL
+        run: |
+          python main.py "GOOGL" "2026-04-08"
+      
+      - name: 运行 TradingAgents 分析 META
+        run: |
+          python main.py "META" "2026-04-08"
+      
+      - name: 运行 TradingAgents 分析 TSLA
+        run: |
+          python main.py "TSLA" "2026-04-08"
+      
+      - name: 提交分析结果
+        run: 
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git add results/ || true
+          
+          git diff --staged --quiet || git commit -m "🤖 Auto: TradingAgents 分析结果 [skip ci]"
+          
+          git push

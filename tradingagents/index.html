@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradingAgents AI 交易分析 | TradingAgents</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <div class="header">
+      <h1>🤖 TradingAgents AI 交易分析</h1>
+      <p class="subtitle">多智能体 LLM 金融交易框架</p>
+      <div class="badges">
+        <span class="badge bl">🤖 AI Trading</span>
+        <span class="badge gn">✅ 多智能体</span>
+        <span class="badge yw">🔬 实时分析</span>
+      </div>
+      <div class="update-info" id="updateInfo">最后更新：--</div>
+    </div>
+
+    <!-- Tab -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('latest',this)">📊 最新分析</button>
+      <button class="tab" onclick="switchTab('history',this)">📜 历史记录</button>
+      <button class="tab" onclick="switchTab('stocks',this)">📊 股票列表</button>
+      <button class="tab" onclick="switchTab('docs',this)">📄 使用文档</button>
+    </div>
+
+    <!-- ===== 最新分析 ===== -->
+    <div class="section active" id="sec-latest">
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">📊</div>最新 AI 分析结果</div>
+        <p style="color:var(--tx2);font-size:0.85em">TradingAgents 多智能体协同分析结果</p>
+      </div>
+
+      <!-- 分析结果容器 -->
+      <div id="analysisResults"></div>
+
+      <!-- 快速分析 -->
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(139,92,246,.2)">⚡</div>快速分析</div>
+        
+        <div class="form-group">
+          <label>股票代码</label>
+          <input type="text" id="stockInput" placeholder="例如：NVDA, AAPL, MSFT" value="NVDA">
+        </div>
+
+        <div class="form-group">
+          <label>分析日期</label>
+          <input type="date" id="dateInput" value="2026-04-08">
+        </div>
+
+        <div class="form-group">
+          <label>LLM 提供商</label>
+          <select id="llmProvider">
+            <option value="openai">OpenAI (GPT-5.4)</option>
+            <option value="google">Google (Gemini 2.5)</option>
+            <option value="anthropic">Anthropic (Claude 3.5)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>分析深度</label>
+          <select id="depth">
+            <option value="1">快速分析（1 轮辩论）</option>
+            <option value="2">标准分析（2 轮辩论）</option>
+            <option value="3">深度分析（3 轮辩论）</option>
+          </select>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="runAnalysis()">🚀 开始分析</button>
+          <button class="btn btn-outline" onclick="loadDemo()">📋 加载示例</button>
+        </div>
+      </div>
+
+      <!-- 最新分析历史 -->
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(16,185,129,.2)">📋</div>最近分析</div>
+        <div id="recentAnalyses"></div>
+      </div>
+    </div>
+
+    <!-- ===== 历史记录 ===== -->
+    <div class="section" id="sec-history">
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(16,185,129,.2)">📜</div>分析历史记录</div>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <!-- ===== 股票列表 ===== -->
+    <div class="section" id="sec-stocks">
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">📊</div>可分析股票列表</div>
+        
+        <div class="stock-grid">
+          <div class="stock-card" onclick="analyzeStock('NVDA')">
+            <div class="stock-emoji">💚</div>
+            <div class="stock-name">NVIDIA</div>
+            <div class="stock-symbol">NVDA</div>
+            <div class="stock-sector">AI 芯片</div>
+          </div>
+
+          <div class="stock-card" onclick="analyzeStock('AAPL')">
+            <div class="stock-emoji">🍎</div>
+            <div class="stock-name">Apple</div>
+            <div class="stock-symbol">AAPL</div>
+            <div class="stock-sector">消费电子</div>
+          </div>
+
+          <div class="stock-card" onclick="analyzeStock('MSFT')">
+            <div class="stock-emoji">💙</div>
+            <div class="stock-name">Microsoft</div>
+            <div class="stock-symbol">MSFT</div>
+            <div class="stock-sector">云计算/AI</div>
+          </div>
+
+          <div class="stock-card" onclick="analyzeStock('AMZN')">
+            <div class="stock-emoji">📦</div>
+            <div class="stock-name">Amazon</div>
+            <div class="stock-symbol">AMZN</div>
+            <div class="stock-sector">电商/云</div>
+          </div>
+
+          <div class="stock-card" onclick="analyzeStock('GOOGL')">
+            <div class="stock-emoji">🔵</div>
+            <div class="stock-name">Alphabet</div>
+            <div class="stock-symbol">GOOGL</div>
+            <div class="stock-sector">搜索/AI</div>
+          </div>
+
+          <div class="stock-card" onclick="analyzeStock('META')">
+            <div class="stock-emoji">🔷</div>
+            <div class="stock-name">Meta</div>
+            <div class="stock-symbol">META</div>
+            <div class="stock-sector">社交媒体</div>
+          </div>
+
+          <div class="stock-card" onclick="analyzeStock('TSLA')">
+            <div class="stock-emoji">⚡</div>
+            <div class="stock-name">Tesla</div>
+            <div class="stock-symbol">TSLA</div>
+            <div class="stock-sector">电动车</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 使用文档 ===== -->
+    <div class="section" id="sec-docs">
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(59,130,246,.2)">📄</div>使用文档</div>
+        
+        <div class="docs-grid">
+          <div class="doc-card">
+            <div class="doc-header">
+              <div class="doc-icon">🚀</div>
+              <div>
+                <div class="doc-title">快速开始</div>
+                <div class="doc-desc">5 分钟上手TradingAgents</div>
+              </div>
+            </div>
+            <div class="doc-body">
+              <ol>
+                <li>1. 安装依赖：<code>pip install langchain langchain-openai langgraph</code></li>
+                <li>2. 配置 API Key：复制 <code>.env.example</code> 并填写你的 Key</li>
+                <li>3. 运行分析：<code>python main.py</code></li>
+                <li>4. 查看结果：程序会输出完整的分析报告</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-header">
+              <div class="doc-icon">🤖</div>
+              <div>
+                <div class="doc-title">智能体架构</div>
+                <div class="doc-desc">了解 7 个专业智能体的协作方式</div>
+              </div>
+            </div>
+            <div class="doc-body">
+              <ul>
+                <li><strong>分析团队：</strong>基本面、情绪、新闻、技术分析师</li>
+                <li><strong>研究团队：</strong>看多/看空研究员</li>
+                <li><strong>交易代理：</strong>整合各方信息做出决策</li>
+                <li><strong>风险管理：</strong>评估组合风险</li>
+                <li><strong>组合管理：</strong>最终决策审批</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-header">
+              <div class="doc-icon">📊</div>
+              <div>
+                <div class="doc-title">支持的 LLM</div>
+                <div class="doc-desc">OpenAI、Google、Anthropic、xAI、Ollama</div>
+              </div>
+            </div>
+            <div class="doc-body">
+              <p style="margin-bottom:8px;">推荐模型：</p>
+              <ul>
+                <li>✅ <strong>OpenAI GPT-5.4</strong>：最强推理能力</li>
+                <li>✅ <strong>Anthropic Claude 3.5</strong>：安全、可控</li>
+                <li>✅ <strong>Google Gemini 2.5</strong>：多模态支持</li>
+                <li>🔄 <strong>Ollama LLaMA 3</strong>：免费本地模型</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-header">
+              <div class="doc-icon">🔗</div>
+              <div>
+                <div class="doc-title">配置选项</div>
+                <div class="doc-desc">深度自定义分析参数</div>
+              </div>
+            </div>
+            <div class="doc-body">
+              <ul>
+                <li><strong>max_debate_rounds</strong>：辩论轮数（1-3）</li>
+                <li><strong>output_language</strong>：报告语言（中文、英文）</li>
+                <li><strong>data_vendors</strong>：数据源选择</li>
+                <li><strong>llm_provider</strong>：LLM 提供商</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 模拟数据
+    const demoAnalysis = {
+      stock: 'NVDA',
+      date: '2026-04-08',
+      decision: 'BUY',
+      confidence: 0.82,
+      targetPrice: 1100,
+      stopLoss: 900,
+      takeProfit: 1250,
+      positionSize: 100,
+      rationale: 'AI_infrastructure_boom + strong_fundamentals + technical_momentum',
+      analyst: {
+        fundamental: {
+          rating: 'strong_buy',
+          pe_ratio: 45.2,
+          revenue_growth: 156.3,
+          summary: 'NVDA 基本面健康，PE 45.2x 低于历史均值，营收增长 156.3%'
+        },
+        sentiment: {
+          score: 0.75,
+          trend: 'bullish',
+          summary: 'AI 基础设施需求强劲，看多情绪 75%'
+        },
+        technical: {
+          signal: 'buy',
+          macd: -5.2,
+          rsi: 65,
+          summary: '技术面强势，突破 50 日均线'
+        }
+      },
+      researcher: {
+        bullish: {
+          target: 1100,
+          confidence: 0.85,
+          summary: 'Blackwell 需求爆表，到 2027 年 1 万亿美元订单'
+        },
+        bearish: {
+          target: 900,
+          confidence: 0.65,
+          summary: '高估值风险，竞争加剧，监管担忧'
+        }
+      },
+      risk: {
+        level: 'MEDIUM',
+        maxDrawdown: -8.5,
+        positionSize: 5,
+        summary: '建议配置 5-10% 组合权重，设置 15% 止损'
+      }
+    };
+
+    const recentAnalyses = [
+      {
+        stock: 'NVDA',
+        date: '2026-04-08',
+        decision: 'BUY',
+        confidence: 0.82,
+        targetPrice: 1100
+      },
+      {
+        stock: 'AAPL',
+        date: '2026-04-07',
+        decision: 'HOLD',
+        confidence: 0.65,
+        targetPrice: 200
+      },
+      {
+        stock: 'MSFT',
+        date: '2026-04-06',
+        decision: 'BUY',
+        confidence: 0.88,
+        targetPrice: 450
+      }
+    ];
+
+    // 标签页切换
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`sec-${tabId}`).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // 运行分析（模拟）
+    function runAnalysis() {
+      const stock = document.getElementById('stockInput').value;
+      const date = document.getElementById('dateInput').value;
+      const llmProvider = document.getElementById('llmProvider').value;
+      const depth = document.getElementById('depth').value;
+
+      if (!stock || !date) {
+        alert('请输入股票代码和日期');
+        return;
+      }
+
+      const container = document.getElementById('analysisResults');
+      
+      // 显示加载状态
+      container.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>🤖 TradingAgents 正在分析 ${stock}...</p>
+          <ul>
+            <li>📊 基本面分析师正在分析...</li>
+            <li>💭 情绪分析师正在扫描社交媒体...</div>
+            <li>📈 技术分析师正在计算指标...</li>
+            <li>📰 新闻分析师正在阅读新闻...</li>
+          </ul>
+          <p style="margin-top:12px;color:var(--tx2);font-size:0.9em;">预计需要 30-60 秒...</p>
+        </div>
+      `;
+
+      // 模拟分析延迟
+      setTimeout(() => {
+        showAnalysisResult(stock, date, depth);
+      }, 3000);
+    }
+
+    // 显示分析结果
+    function showAnalysisResult(stock, date, depth) {
+      const container = document.getElementById('analysisResults');
+      
+      const decisionColor = demoAnalysis.decision === 'BUY' ? 'var(--gn)' : demoAnalysis.decision === 'SELL' ? 'var(--rd)' : 'var(--yw)';
+      
+      container.innerHTML = `
+        <div class="analysis-result">
+          <div class="result-header">
+            <div class="result-decision" style="background:${decisionColor}">${demoAnalysis.decision}</div>
+            <div class="result-info">
+              <div class="stock">${stock}</div>
+              <div class="date">${date}</div>
+              <div class="confidence">置信度: ${(demoAnalysis.confidence * 100).toFixed(0)}%</div>
+            </div>
+          </div>
+
+          <div class="result-grid">
+            <!-- 基本面分析 -->
+            <div class="result-card">
+              <div class="card-icon">📊</div>
+              <h3>基本面分析</h3>
+              <div class="rating-badge ${demoAnalysis.analyst.fundamental.rating === 'strong_buy' ? 'success' : 'warning'}">${demoAnalysis.analyst.fundamental.rating}</div>
+              <div class="metrics">
+                <div class="metric">
+                  <div class="metric-label">PE 比率</div>
+                  <div class="metric-value">${demoAnalysis.analyst.fundamental.pe_ratio}x</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">营收增长</div>
+                  <div class="metric-value success">+${demoAnalysis.analyst.fundamental.revenue_growth}%</div>
+                </div>
+              </div>
+              <div class="summary">${demoAnalysis.analyst.fundamental.summary}</div>
+            </div>
+
+            <!-- 情绪分析 -->
+            <div class="result-card">
+              <div class="card-icon">💭</div>
+              <h3>情绪分析</h3>
+              <div class="metrics">
+                <div class="metric">
+                  <div class="metric-label">情绪得分</div>
+                  <div class="metric-value">${demoAnalysis.analyst.sentiment.score}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">趋势</div>
+                  <div class="metric-value ${demoAnalysis.analyst.sentiment.trend === 'bullish' ? 'success' : 'warning'}">${demoAnalysis.analyst.sentiment.trend}</div>
+                </div>
+              </div>
+              <div class="summary">${demoAnalysis.analyst.sentiment.summary}</div>
+            </div>
+
+            <!-- 技术分析 -->
+            <div class="result-card">
+              <div class="card-icon">📈</div>
+              <h3>技术分析</h3>
+              <div class="metrics">
+                <div class="metric">
+                  <div class="metric-label">MACD</div>
+                  <div class="metric-value">${demoAnalysis.analyst.technical.macd}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">RSI</div>
+                  <div class="metric-value ${demoAnalysis.analyst.technical.rsi}</div>
+                </div>
+              </div>
+              <div class="summary">${demoAnalysis.analyst.technical.summary}</div>
+            </div>
+          </div>
+
+          <!-- 研究结果 -->
+          <div class="research-grid">
+            <div class="research-card bullish">
+              <h4>🟢 看多研究</h4>
+              <div class="target-price">
+                <div class="price-label">目标价</div>
+                <div class="price-value">$${demoAnalysis.researcher.bullish.target}</div>
+              </div>
+              <div class="confidence">置信度 ${(demoAnalysis.researcher.bullish.confidence * 100).toFixed(0)}%</div>
+              <p class="research-summary">${demoAnalysis.researcher.bullish.summary}</p>
+            </div>
+
+            <div class="research-card bearish">
+              <h4>📉 看空研究</h4>
+              <div class="target-price">
+                <div class="price-label">目标价</div>
+                <div class="price-value">$${demoAnalysis.researcher.bearish.target}</div>
+              </div>
+              <div class="confidence">置信度 ${(demoAnalysis.researcher.bearish.confidence * 100).toFixed(0)}%</div>
+              <p class="research-summary">${demoAnalysis.researcher.bearish.summary}</p>
+            </div>
+          </div>
+
+          <!-- 最终决策 -->
+          <div class="final-decision">
+            <h3>📊 最终交易决策</h3>
+            <div class="decision-grid">
+              <div class="decision-item">
+                <div class="decision-label">操作</div>
+                <div class="decision-value" style="color:${decisionColor}">${demoAnalysis.decision}</div>
+              </div>
+              <div class="decision-item">
+                <div class="decision-label">数量</div>
+                <div class="decision-value">${demoAnalysis.positionSize} 股</div>
+              </div>
+              <div class="decision-item">
+                <div class="decision-label">入场价</div>
+                <div class="decision-value">$${demoAnalysis.analyst.fundamental.pe_ratio * 1000}</div>
+              </div>
+              <div class="decision-item">
+                <div class="decision-label">止损</div>
+                <div class="decision-value">$${demoAnalysis.risk.maxDrawdown}</div>
+              </div>
+              <div class="decision-item">
+                <div class="decision-label">止盈</div>
+                <div class="decision-value">$${demoAnalysis.researcher.bullish.target}</div>
+              </div>
+            </div>
+            <div class="rationale">${demoAnalysis.rationale}</div>
+            
+            <div class="risk-box">
+              <h4>⚠️ 风险评估</h4>
+              <div class="risk-level">${demoAnalysis.risk.level}</div>
+              <div class="risk-metrics">
+                <div class="risk-metric">
+                  <div class="risk-label">最大回撤</div>
+                  <div class="risk-value">${demoAnalysis.risk.maxDrawdown}%</div>
+                </div>
+                <div class="risk-metric">
+                  <div class="risk-label">持仓比例</div>
+                  <div class="risk-value">${demoAnalysis.risk.positionSize}%</div>
+                </div>
+              </div>
+              <div class="risk-summary">${demoAnalysis.risk.summary}</div>
+            </div>
+          </div>
+
+          <!-- 时间戳 -->
+          <div class="timestamp">分析完成时间：${new Date().toLocaleString('zh-CN')}</div>
+        </div>
+      `;
+    }
+
+    // 加载示例
+    function loadDemo() {
+      document.getElementById('stockInput').value = 'NVDA';
+      document.getElementById('dateInput').value = '2026-04-08';
+      document.getElementById('llmProvider').value = 'openai';
+      document.getElementById('depth').value = '2';
+      runAnalysis();
+    }
+
+    // 分析特定股票
+    function analyzeStock(stock) {
+      document.getElementById('stockInput').value = stock;
+      document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+      document.getElementById('llmProvider').value = 'openai';
+      document.getElementById('depth').value = '2';
+      switchTab('latest', document.querySelector('.tab'));
+      runAnalysis();
+    }
+
+    // 初始化
+    function init() {
+      // 加载最近分析记录
+      const container = document.getElementById('recentAnalyses');
+      
+      container.innerHTML = recentAnalyses.map(a => {
+        const decisionColor = a.decision === 'BUY' ? 'var(--gn)' : a.decision === 'SELL' ? 'var(--rd)' : 'var(--yw)';
+        return `
+          <div class="recent-item">
+            <div class="stock">${a.stock}</div>
+            <div class="date">${a.date}</div>
+            <div class="decision" style="background:${decisionColor}">${a.decision}</div>
+            <div class="confidence">${(a.confidence * 100).toFixed(0)}%</div>
+            <div class="target">$${a.targetPrice}</div>
+            <button class="btn btn-outline btn-sm" onclick="loadStockAnalysis('${a.stock}', '${a.date}')">📋 查看</button>
+          </div>
+        `;
+      }).join('');
+
+      // 更新时间
+      document.getElementById('updateInfo').textContent = `最后更新：${new Date().toLocaleString('zh-CN')}`;
+    }
+
+    // 加载特定股票的历史分析
+    function loadStockAnalysis(stock, date) {
+      document.getElementById('stockInput').value = stock;
+      document.getElementById('dateInput').value = date;
+      showAnalysisResult(stock, date, 2);
+    }
+
+    // 页面加载时初始化
+    init();
+  </script>
+</body>
+</html>
